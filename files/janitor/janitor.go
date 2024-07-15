@@ -2,6 +2,8 @@ package main
 
 import (
 	"compress/gzip"
+	"crypto/sha1"
+	"fmt"
 	"io"
 	"io/fs"
 	"log"
@@ -74,4 +76,44 @@ func fileToCompress(dir string, maxAge time.Duration) ([]string, error) {
 	}
 
 	return names, nil
+}
+
+func fileSHA1(fileName string) (string, error) {
+	file, err := os.Open(fileName)
+	if err != nil {
+		return "", err
+	}
+	defer file.Close()
+
+	var r io.Reader = file
+	if path.Ext(fileName) == ".gz" {
+		var err error
+		r, err = gzip.NewReader(file)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	w := sha1.New()
+	if _, err := io.Copy(w, r); err != nil {
+		return "", err
+	}
+
+	sig := fmt.Sprintf("%x", w.Sum(nil))
+	return sig, nil
+
+}
+
+func sameSig(file1, file2 string) (bool, error) {
+	sig1, err := fileSHA1(file1)
+	if err != nil {
+		return false, err
+	}
+
+	sig2, err := fileSHA1(file2)
+	if err != nil {
+		return false, err
+	}
+
+	return sig1 == sig2, nil
 }
