@@ -3,6 +3,7 @@ package main
 import (
 	"compress/gzip"
 	"crypto/sha1"
+	"flag"
 	"fmt"
 	"io"
 	"io/fs"
@@ -116,4 +117,48 @@ func sameSig(file1, file2 string) (bool, error) {
 	}
 
 	return sig1 == sig2, nil
+}
+
+func compressFiles(rootDir string, maxAge time.Duration) error {
+	files, err := fileToCompress(rootDir, maxAge)
+	if err != nil {
+		return err
+	}
+
+	for _, src := range files {
+		dest := src + ".gz"
+		if err := gzCompress(src, dest); err != nil {
+			return fmt.Errorf("%q: %w", src, err)
+		}
+
+		match, err := sameSig(src, dest)
+		if err != nil {
+			return err
+		}
+
+		if !match {
+			return fmt.Errorf("%q <-> %q: signature don't match", src, dest)
+		}
+
+		if err := os.Remove(src); err != nil {
+			log.Printf("warning: %q: can't delete - %s", src, err)
+		}
+	}
+
+	return nil
+}
+
+func main() {
+	var rootDir string
+	flag.StringVar(&rootDir, "root", ".", "root dir")
+	flag.Usage = func() {
+		fmt.Fprintf(os.Stderr, "usage: janitor")
+		flag.PrintDefaults()
+	}
+	flag.Parse()
+
+	const maxAge = 30 * 24 * time.Hour
+	if err := compressFiles(rootDir, maxAge); err != nil {
+		log.Fatalf("error: %s", err)
+	}
 }
