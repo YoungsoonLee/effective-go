@@ -2,11 +2,8 @@ package main
 
 import (
 	"bufio"
-	"compress/gzip"
+	"fmt"
 	"io"
-	"log"
-	"os"
-	"path/filepath"
 	"strings"
 )
 
@@ -33,36 +30,45 @@ func numRedirects(r io.Reader) (nLines int, nRedirects int, err error) {
 }
 
 func main() {
-	matches, err := filepath.Glob("logs/http-*.log")
-	if err != nil {
-		log.Fatal(err)
-	}
+	s := "(II) (2012-2011)"
 
-	nLines, nRedirects := 0, 0
-	for _, name := range matches {
-		file, err := os.Open(name)
-		if err != nil {
-			log.Print(err)
-			continue
-		}
+	fmt.Println(strings.Split(strings.ReplaceAll(s, ")", ""), "("))
 
-		var r io.Reader = file
-		if strings.HasSuffix(name, ".gz") {
-			r, err = gzip.NewReader(r)
-			if err != nil {
-				log.Print(err)
-				continue
-			}
-		}
+	s2 := "2020-"
+	fmt.Println(len(strings.Split(s2, "-")))
 
-		lines, redirects, err := numRedirects(r)
-		if err != nil {
-			log.Print(err)
-		}
+	fmt.Println(strings.HasSuffix("2020-", "-"))
 
-		nLines += lines
-		nRedirects += redirects
-	}
+	// matches, err := filepath.Glob("logs/http-*.log")
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
-	log.Printf("lines: %d, redirects: %d", nLines, nRedirects)
+	// nLines, nRedirects := 0, 0
+	// for _, name := range matches {
+	// 	file, err := os.Open(name)
+	// 	if err != nil {
+	// 		log.Print(err)
+	// 		continue
+	// 	}
+
+	// 	var r io.Reader = file
+	// 	if strings.HasSuffix(name, ".gz") {
+	// 		r, err = gzip.NewReader(r)
+	// 		if err != nil {
+	// 			log.Print(err)
+	// 			continue
+	// 		}
+	// 	}
+
+	// 	lines, redirects, err := numRedirects(r)
+	// 	if err != nil {
+	// 		log.Print(err)
+	// 	}
+
+	// 	nLines += lines
+	// 	nRedirects += redirects
+	// }
+
+	// log.Printf("lines: %d, redirects: %d", nLines, nRedirects)
 }
