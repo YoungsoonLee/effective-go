@@ -56,6 +56,6 @@ func sendFile(addr, fileName string) error {
 
 func main() {
 	if err := sendFile("localhost:8765", "client.go"); err != nil {
-		log.Fatal().Err(err).Msg("Failed to send file")
+		log.Panicf("Failed to send file: %v", err)
 	}
 }

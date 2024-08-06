@@ -1,0 +1,15 @@
+- name: simple
+  err: false
+  box_capacity: 6
+  weights:
+    - 2.3
+    - 3.7
+    - 5
+  num_boxes: 2
+- name: over
+  err: true
+  box_capacity: 10
+  weights:
+    - 1.2
+    - 37
+    - 9.5
