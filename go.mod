@@ -3,6 +3,7 @@ module github.com/YoungsoonLee/effective-go
 go 1.22.1
 
 require (
+	github.com/ardanlabs/conf/v3 v3.1.7
 	github.com/google/uuid v1.6.0
 	github.com/mitchellh/mapstructure v1.5.0
 	github.com/stretchr/testify v1.9.0
